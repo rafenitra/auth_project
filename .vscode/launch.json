@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-AuthbackApplication<authback>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.authbackend.authback.AuthbackApplication",
+            "projectName": "authback",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
