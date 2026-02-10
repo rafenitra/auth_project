@@ -13,6 +13,7 @@ import com.authbackend.authback.entity.User;
 import com.authbackend.authback.repository.RoleRepository;
 import com.authbackend.authback.repository.UserRepository;
 
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,6 +23,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
 
     //Méthode pour la création de compte
@@ -49,8 +51,9 @@ public class AuthService {
         if(!passwordEncoder.matches(loginRequest.password() , user.getPassword())){
             throw new RuntimeException("Mot de passe incorrect");
         }
-        
+
         //envoyer le token
-        return new AuthResponse("TEMP_TOKEN");
+        String token = (String) jwtService.generateToken(user.getEmail());
+        return new AuthResponse(token);
     }
 }
