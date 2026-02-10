@@ -10,6 +10,9 @@ import com.authbackend.authback.dto.AuthResponse;
 import com.authbackend.authback.dto.RegisterRequest;
 import com.authbackend.authback.entity.Role;
 import com.authbackend.authback.entity.User;
+import com.authbackend.authback.exception.EmailAlreadyUsedException;
+import com.authbackend.authback.exception.InvalidPasswordException;
+import com.authbackend.authback.exception.EmailNotFoundException;
 import com.authbackend.authback.repository.RoleRepository;
 import com.authbackend.authback.repository.UserRepository;
 
@@ -29,7 +32,7 @@ public class AuthService {
     //Méthode pour la création de compte
     public String register(RegisterRequest registerRequest){
         if(userRepository.existsByEmail(registerRequest.email())){
-            throw new RuntimeException("Email déjà utilisé");
+            throw new EmailAlreadyUsedException("Email déjà utilisé");
         }
 
         Role userRole = roleRepository.findByName("USER")
@@ -47,9 +50,9 @@ public class AuthService {
     //Méthode pour la connexion 
     public AuthResponse login(LoginRequest loginRequest){
         User user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new EmailNotFoundException("Email non trouvé"));
         if(!passwordEncoder.matches(loginRequest.password() , user.getPassword())){
-            throw new RuntimeException("Mot de passe incorrect");
+            throw new InvalidPasswordException("Mot de passe incorrect");
         }
 
         //envoyer le token
