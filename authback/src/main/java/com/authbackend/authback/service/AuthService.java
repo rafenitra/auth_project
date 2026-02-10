@@ -5,6 +5,8 @@ import java.util.Set;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.authbackend.authback.dto.LoginRequest;
+import com.authbackend.authback.dto.AuthResponse;
 import com.authbackend.authback.dto.RegisterRequest;
 import com.authbackend.authback.entity.Role;
 import com.authbackend.authback.entity.User;
@@ -38,5 +40,17 @@ public class AuthService {
                 .build();
         userRepository.save(user);
         return "Utilisateur enregistré avec succès";
+    }
+
+    //Méthode pour la connexion 
+    public AuthResponse login(LoginRequest loginRequest){
+        User user = userRepository.findByEmail(loginRequest.email())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        if(!passwordEncoder.matches(loginRequest.password() , user.getPassword())){
+            throw new RuntimeException("Mot de passe incorrect");
+        }
+        
+        //envoyer le token
+        return new AuthResponse("TEMP_TOKEN");
     }
 }

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.authbackend.authback.dto.LoginRequest;
+import com.authbackend.authback.dto.AuthResponse;
 import com.authbackend.authback.dto.RegisterRequest;
 import com.authbackend.authback.service.AuthService;
 
@@ -24,6 +26,13 @@ public class AuthController {
     public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
         String message = authService.register(registerRequest);
         return ResponseEntity.ok(message);
+    }
+
+    //appelé pour la connexion 
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login (@RequestBody LoginRequest loginRequest){
+        AuthResponse response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
     }
 
 }
