@@ -1,10 +1,11 @@
 package com.authbackend.authback.controller;
 
+import com.authbackend.authback.dto.MeResponse;
+import com.authbackend.authback.entity.User;
+import com.authbackend.authback.mapper.UserMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import com.authbackend.authback.dto.LoginRequest;
 import com.authbackend.authback.dto.AuthResponse;
@@ -33,6 +34,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login (@RequestBody LoginRequest loginRequest){
         AuthResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(response);
+    }
+
+    //Pour avoir l'information de celui qui est connecté
+    @GetMapping("/me")
+    public ResponseEntity<MeResponse> me(){
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        return ResponseEntity.ok(UserMapper.toMeResponse(user));
     }
 
 }
