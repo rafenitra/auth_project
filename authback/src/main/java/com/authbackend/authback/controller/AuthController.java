@@ -4,6 +4,7 @@ import com.authbackend.authback.dto.MeResponse;
 import com.authbackend.authback.entity.User;
 import com.authbackend.authback.mapper.UserMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +43,12 @@ public class AuthController {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
         return ResponseEntity.ok(UserMapper.toMeResponse(user));
+    }
+
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> adminOnly(){
+        return ResponseEntity.ok("Vous êtes un administrateur");
     }
 
 }
