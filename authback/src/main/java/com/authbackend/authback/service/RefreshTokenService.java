@@ -2,6 +2,9 @@ package com.authbackend.authback.service;
 
 import com.authbackend.authback.entity.RefreshToken;
 import com.authbackend.authback.entity.User;
+import com.authbackend.authback.exception.TokenExpiredException;
+import com.authbackend.authback.exception.TokenNotFoundException;
+import com.authbackend.authback.exception.TokenRevokedException;
 import com.authbackend.authback.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +18,8 @@ public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    //validité 7j
-    private final long refreshTokenDurationMs = 7 * 24 * 60* 60 * 1000;
+    //validité 2 min
+    private final long refreshTokenDurationMs =  2 * 60 * 1000;
 
     public RefreshToken createRefreshToken(User user){
         RefreshToken refreshToken = RefreshToken.builder()
@@ -25,18 +28,18 @@ public class RefreshTokenService {
                 .expireDate(Instant.now().plusMillis(refreshTokenDurationMs))
                 .revoked(false)
                 .build();
-        return refreshToken;
+        return refreshTokenRepository.save(refreshToken);
     }
 
     public RefreshToken validateRefreshToken(String token){
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("RefreshToken Introuvable"));
+                .orElseThrow(() -> new TokenNotFoundException("RefreshToken Introuvable"));
         if(refreshToken.isRevoked()){
-            throw new RuntimeException("RefresToken revoqué");
+            throw new TokenRevokedException("RefresToken revoqué");
         }
 
         if(refreshToken.getExpireDate().isBefore(Instant.now())){
-            throw  new RuntimeException("RefreshToken expiré");
+            throw  new TokenExpiredException("RefreshToken expiré");
         }
         return  refreshToken;
     }

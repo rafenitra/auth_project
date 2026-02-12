@@ -54,4 +54,11 @@ public class AuthController {
     public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest refreshRequest){
         return ResponseEntity.ok(authService.refreshToken(refreshRequest));
     }
+
+    //logout
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody LogoutRequest logoutRequest){
+        authService.logout(logoutRequest);
+        return ResponseEntity.ok("Vous êtes déconnecté");
+    }
 }

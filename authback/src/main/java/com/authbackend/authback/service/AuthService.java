@@ -2,16 +2,14 @@ package com.authbackend.authback.service;
 
 import java.util.Set;
 
-import com.authbackend.authback.dto.RefreshRequest;
+import com.authbackend.authback.dto.*;
 import com.authbackend.authback.entity.RefreshToken;
+import com.authbackend.authback.repository.RefreshTokenRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.authbackend.authback.dto.LoginRequest;
-import com.authbackend.authback.dto.AuthResponse;
-import com.authbackend.authback.dto.RegisterRequest;
 import com.authbackend.authback.entity.Role;
 import com.authbackend.authback.entity.User;
 import com.authbackend.authback.exception.EmailAlreadyUsedException;
@@ -32,7 +30,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
-    private final AuthenticationManager authenticationManager;
 
 
     //Méthode pour la création de compte
@@ -81,5 +78,12 @@ public class AuthService {
         RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(oldRefreshToken);
 
         return new AuthResponse(newAccessToken, newRefreshToken.getToken());
+    }
+
+    //logout
+    public void logout(LogoutRequest logoutRequest){
+        //vérification que c'est encore valide
+        RefreshToken refreshToken = refreshTokenService.validateRefreshToken(logoutRequest.refreshToken());
+        refreshTokenService.revokeToken(refreshToken);
     }
 }
