@@ -49,7 +49,7 @@ public class JwtService {
             .builder()
             .setSubject(email)
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + 3600 * 24))
+            .setExpiration(new Date(System.currentTimeMillis() + 60 * 15 * 1000))
             .signWith(getSigninKey(), SignatureAlgorithm.HS256)
             .compact();
     }
@@ -66,4 +66,5 @@ public class JwtService {
     private boolean isTokenExpired(String token){
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
+
 }

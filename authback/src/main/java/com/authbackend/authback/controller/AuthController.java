@@ -1,6 +1,6 @@
 package com.authbackend.authback.controller;
 
-import com.authbackend.authback.dto.MeResponse;
+import com.authbackend.authback.dto.*;
 import com.authbackend.authback.entity.User;
 import com.authbackend.authback.mapper.UserMapper;
 import org.springframework.http.ResponseEntity;
@@ -8,9 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.authbackend.authback.dto.LoginRequest;
-import com.authbackend.authback.dto.AuthResponse;
-import com.authbackend.authback.dto.RegisterRequest;
 import com.authbackend.authback.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -51,4 +48,10 @@ public class AuthController {
         return ResponseEntity.ok("Vous êtes un administrateur");
     }
 
+
+    // rafraichir les tokens
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest refreshRequest){
+        return ResponseEntity.ok(authService.refreshToken(refreshRequest));
+    }
 }

@@ -2,6 +2,10 @@ package com.authbackend.authback.service;
 
 import java.util.Set;
 
+import com.authbackend.authback.dto.RefreshRequest;
+import com.authbackend.authback.entity.RefreshToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +31,8 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
+    private final AuthenticationManager authenticationManager;
 
 
     //Méthode pour la création de compte
@@ -55,8 +61,25 @@ public class AuthService {
             throw new InvalidPasswordException("Mot de passe incorrect");
         }
 
-        //envoyer le token
-        String token = (String) jwtService.generateToken(user.getEmail());
-        return new AuthResponse(token);
+        //générer l'access token
+        String accessToken = jwtService.generateToken(user.getEmail());
+
+        //générer le refreshToken
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        return new AuthResponse(accessToken, refreshToken.getToken());
+    }
+
+    //méthode de rafraîchissement des deux token
+    public AuthResponse refreshToken(RefreshRequest refreshRequest){
+        RefreshToken oldRefreshToken = refreshTokenService.validateRefreshToken(refreshRequest.refreshToken());
+
+        User user = oldRefreshToken.getUser();
+
+        String newAccessToken = jwtService.generateToken(user.getEmail());
+
+        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(oldRefreshToken);
+
+        return new AuthResponse(newAccessToken, newRefreshToken.getToken());
     }
 }
