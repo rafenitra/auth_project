@@ -52,13 +52,8 @@ public class RefreshTokenService {
     public RefreshToken rotateRefreshToken(RefreshToken oldToken){
         //Révoquer l'ancien
         revokeToken(oldToken);
-
-        //générer un nouveau
+        //générer un nouveau-7
         return createRefreshToken(oldToken.getUser());
-
     }
-
-
-
 
 }

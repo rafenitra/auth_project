@@ -17,7 +17,7 @@ public class JwtService {
     //Clé secrète pour la signture du token
     private final String SECRET_KEY = "azeazelqshebfgbiqsdnvqmsdgmnvqmogquergegzmoidjffgzsneuighserrg";
 
-    //gnérer la clé de signature utilisable par JJWT
+    //générer la clé de signature utilisable par JJWT
     private Key getSigninKey(){
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }

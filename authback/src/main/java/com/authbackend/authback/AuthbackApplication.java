@@ -9,5 +9,4 @@ public class AuthbackApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AuthbackApplication.class, args);
 	}
-
 }
