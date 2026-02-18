@@ -4,6 +4,8 @@ import com.authbackend.authback.dto.*;
 import com.authbackend.authback.entity.RefreshToken;
 import com.authbackend.authback.entity.Role;
 import com.authbackend.authback.entity.User;
+import com.authbackend.authback.exception.EmailNotFoundException;
+import com.authbackend.authback.exception.InvalidPasswordException;
 import com.authbackend.authback.repository.RefreshTokenRepository;
 import com.authbackend.authback.repository.RoleRepository;
 import com.authbackend.authback.repository.UserRepository;
@@ -23,8 +25,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.sql.Ref;
 import java.util.Optional;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 
 @ActiveProfiles("test")
@@ -132,4 +134,31 @@ public class AuthServiceTest {
         verify(refreshTokenService,times(1)).revokeToken(refreshToken);
     }
 
+    @Test
+    void login_returnEmailNotFoundException(){
+        LoginRequest loginRequest = new LoginRequest("test@gmail.com","pass123");
+
+        Mockito.when(userRepository.findByEmail(loginRequest.email())).thenReturn(Optional.empty());
+
+        assertThrows(EmailNotFoundException.class,() -> {
+            authService.login(loginRequest);
+        });
+    }
+
+    @Test
+    void login_returnInvalidPasswordException(){
+        User user = User.builder()
+                .username("Test")
+                .email("test@gmail.com")
+                .password("pass123")
+                .build();
+        LoginRequest loginRequest = new LoginRequest("test@gmail.com","pass123");
+
+        Mockito.when(userRepository.findByEmail(loginRequest.email())).thenReturn(Optional.of(user));
+        Mockito.when(passwordEncoder.matches(loginRequest.password(),user.getPassword())).thenReturn(false);
+
+        assertThrows(InvalidPasswordException.class, ()-> {
+            authService.login(loginRequest);
+        });
+    }
 }
