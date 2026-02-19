@@ -4,10 +4,16 @@ spring:
     driverClassName: org.h2.Driver
     username: emptyName
     password:
+    hikari:
+      maximum-pool-size: 1
+  config:
+    activate:
+      on-profile: test
 
   jpa:
     hibernate:
       ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
 
   h2:
