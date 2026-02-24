@@ -85,8 +85,15 @@ export class LoginComponent {
   }
 
   ngOnInit(): void {
-    if(this.authService.getAccessToken()){
-      this.router.navigate(['/accueil']);
+    const accessToken = this.authService.getAccessToken();
+    const refreshToken = this.authService.getRefreshToken();
+    if(accessToken && refreshToken){
+      this.authService.refresh(refreshToken || '').subscribe((res)=>{
+        if(res.accessToken && res.refreshToken){
+          this.authService.saveTokens(res.accessToken, res.refreshToken);
+          this.router.navigate(['/accueil']);
+        }
+      })
     }
   }
 }
