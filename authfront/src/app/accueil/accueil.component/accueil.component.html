@@ -1,0 +1,23 @@
+<nav class="navbar">
+  <div class="logo">Mon Application</div>
+
+  <div class="profile-container">
+    <img 
+      src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+      class="profile-icon"
+      (click)="toggleMenu()"
+    />
+
+    @if (showMenu) {
+      <div class="menu">
+        <p (click)="goToProfile()">Mon Profil</p>
+        <p (click)="logout()">Déconnexion</p>
+      </div>
+    }
+  </div>
+</nav>
+
+<div class="content">
+  <h1>Bienvenue sur votre espace</h1>
+  <p>Vous êtes connecté avec succès.</p>
+</div>
