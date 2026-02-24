@@ -39,6 +39,7 @@ public class RefreshTokenService {
         }
 
         if(refreshToken.getExpireDate().isBefore(Instant.now())){
+            revokeToken(refreshToken);
             throw  new TokenExpiredException("RefreshToken expiré");
         }
         return  refreshToken;

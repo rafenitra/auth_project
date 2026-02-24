@@ -1,0 +1,29 @@
+
+@if (!loading) {
+    <div class="profile-container">
+
+        <h2>Mon Profil</h2>
+
+        @if(user){
+            <div>
+
+                <div class="info">
+                    <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
+                    <p><strong>Email :</strong> {{ user.email }}</p>
+                </div>
+
+            </div>
+        }
+        @else {
+            <ng-template >
+                <p class="error">{{ errorMessage }}</p>
+            </ng-template>
+        }
+    </div>
+}
+
+@if (loading) {
+    <div >
+        <p>Chargement du profil...</p>
+    </div>
+}

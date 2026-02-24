@@ -82,7 +82,11 @@ export class LoginComponent {
         }
       }
     })
-
   }
 
+  ngOnInit(): void {
+    if(this.authService.getAccessToken()){
+      this.router.navigate(['/accueil']);
+    }
+  }
 }

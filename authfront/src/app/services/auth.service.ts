@@ -20,7 +20,7 @@ export class AuthService {
   }
 
   saveTokens(accessToken: string, refreshToken: string):void {
-    localStorage.setItem('acccessToken', accessToken);
+    localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
   }
 
@@ -42,12 +42,9 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/refresh`, { refreshToken });
   }
 
-  logout(refreshToken: String): Observable<any>{
+  logout(refreshToken: String): Observable<string>{
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    return this.http.post(`${this.apiUrl}/logout`,{refreshToken});
+    return this.http.post(`${this.apiUrl}/logout`,{refreshToken}, {responseType: 'text'});
   }
-
-
-
 }

@@ -1,76 +1,68 @@
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { catchError, Observable, switchMap, throwError } from "rxjs";
-import { AuthService } from "../services/auth.service";
-import { Router } from "@angular/router";
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+import { catchError, switchMap, throwError } from 'rxjs';
+import { TokenRefreshService } from '../services/token-refresh.service';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor{
+export const authInterceptorFn: HttpInterceptorFn = (req, next) => {
 
-    private isRefreshing = false;
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const refreshState = inject(TokenRefreshService);
 
-    constructor(private authService: AuthService, private router: Router){}
+  const accessToken = authService.getAccessToken();
 
+  let authReq = req;
 
-    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        
-        const accessToken = this.authService.getAccessToken();
+  if (accessToken) {
+    authReq = req.clone({
+      setHeaders: { Authorization: `Bearer ${accessToken}` }
+    });
+  }
 
-        let authReq = req;
+  return next(authReq).pipe(
+    catchError((error) => {
 
-        if (accessToken) {
-            authReq = authReq.clone({
-                setHeaders: {Authorization: `Bearer ${accessToken}`}
-            });
+      if (error.status === 401) {
+
+        const refreshToken = authService.getRefreshToken();
+
+        if (!refreshToken) {
+          authService.logout("");
+          router.navigate(['/login']);
+          return throwError(() => error);
         }
 
-        return next.handle(authReq).pipe(
-            catchError((error: HttpErrorResponse)=> {
+        //  Empêche la boucle infinie
+        if (refreshState.isRefreshing) {
+          return throwError(() => error);
+        }
 
-                //cas 1
-                if( error.status === 401 && !this.isRefreshing){
-                    this.isRefreshing = true;
+        refreshState.isRefreshing = true;
 
-                    const refreshToken = this.authService.getRefreshToken();
+        return authService.refresh(refreshToken).pipe(
+          switchMap((res: any) => {
+            refreshState.isRefreshing = false;
 
-                    // Si pas de refreshToken → logout direct
-                    if (!refreshToken) {
-                        this.isRefreshing = false;
-                        this.authService.logout(refreshToken || "").subscribe(()=>{
-                            // Redirection vers la page de login ou autre action
-                            this.router.navigate(['/login']);
-                        });
-                        return throwError(() => error);
-                    }
+            authService.saveTokens(res.accessToken, res.refreshToken);
 
-                    return this.authService.refresh(refreshToken).pipe(
-                        switchMap((res: any)=>{
-                            this.isRefreshing = false;
+            const newReq = req.clone({
+              setHeaders: { Authorization: `Bearer ${res.accessToken}` }
+            });
 
-                            this.authService.saveTokens(res.accessToken, res.refreshToken);
-
-                            const newReq = req.clone({
-                                setHeaders: {Authorization: `Bearer ${res.accessToken}`}
-                            });
-
-                            return next.handle(newReq);
-                        }),
-
-                        catchError((err)=>{
-                            this.isRefreshing = false;
-                            this.authService.logout(refreshToken).subscribe(()=>{
-                                // Redirection vers la page de login ou autre action
-                                this.router.navigate(['/login']);
-                            });
-                            return throwError(() => err);
-                        })
-                    );
-                }
-
-                //cas 2
-                return throwError(() => error);
-            })
+            return next(newReq);
+          }),
+          catchError((refreshError) => {
+            refreshState.isRefreshing = false;
+            authService.logout(refreshToken);
+            router.navigate(['/login']);
+            return throwError(() => refreshError);
+          })
         );
-    }
-    
-}
+      }
+
+      return throwError(() => error);
+    })
+  );
+};

@@ -26,9 +26,11 @@ export class AccueilComponent {
   }
 
   logout() {
-    this.authService.logout(localStorage.getItem('refreshToken') || "").subscribe(()=>{
+    this.authService.logout(localStorage.getItem('refreshToken') || "").subscribe((res)=>{
       // Redirection vers la page de login ou autre action
-      this.router.navigate(['/login']);
+      if(res.length > 0){
+        this.router.navigate(['/login']);
+      }
     });
   }
 

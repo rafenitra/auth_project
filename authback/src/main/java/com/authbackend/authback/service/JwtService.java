@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -49,7 +50,7 @@ public class JwtService {
             .builder()
             .setSubject(email)
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + 60 * 1000 * 2)) //2 minutes
+            .setExpiration(new Date(System.currentTimeMillis() + 60 * 1000 * 1)) //1 minutes
             .signWith(getSigninKey(), SignatureAlgorithm.HS256)
             .compact();
     }
@@ -63,8 +64,14 @@ public class JwtService {
     }
 
     //expiration du token
-    private boolean isTokenExpired(String token){
-        return extractClaim(token, Claims::getExpiration).before(new Date());
+    public boolean isTokenExpired(String token){
+        try{
+            Date expiration = extractClaim(token, Claims::getExpiration);
+            return expiration.before(new Date());
+        }
+        catch (ExpiredJwtException e){
+            return  true;
+        }
     }
 
 }

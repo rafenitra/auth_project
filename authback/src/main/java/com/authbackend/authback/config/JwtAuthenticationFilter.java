@@ -37,6 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
+
+        //si le token est expiré
+        if (jwtService.isTokenExpired(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
         String userEmail = jwtService.extractEmail(token);
 
         if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
@@ -51,5 +58,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request){
+        String path = request.getServletPath();
+        return path
+                .equals("/auth/refresh");
     }
 }
