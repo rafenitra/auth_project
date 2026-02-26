@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -16,11 +17,12 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
 
     //Clé secrète pour la signture du token
-    private final String SECRET_KEY = "azeazelqshebfgbiqsdnvqmsdgmnvqmogquergegzmoidjffgzsneuighserrg";
+    @Value("${app.security.jwt-secret}")
+    private String secret_key;
 
     //générer la clé de signature utilisable par JJWT
     private Key getSigninKey(){
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        return Keys.hmacShaKeyFor(secret_key.getBytes());
     }
 
     //extraction de mail du token
