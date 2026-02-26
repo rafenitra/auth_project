@@ -47,7 +47,7 @@ export const authInterceptorFn: HttpInterceptorFn = (req, next) => {
 
             authService.saveTokens(res.accessToken, res.refreshToken);
 
-            const newReq = req.clone({
+            const newReq = authReq.clone({
               setHeaders: { Authorization: `Bearer ${res.accessToken}` }
             });
 

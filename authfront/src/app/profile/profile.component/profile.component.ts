@@ -20,7 +20,6 @@ export class ProfileComponent {
   }
 
   ngOnInit(): void {
-
     this.authService.me().subscribe({
       next: (res) => {
         this.user = res;
