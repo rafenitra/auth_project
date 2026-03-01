@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -43,8 +43,13 @@ export class AuthService {
   }
 
   logout(refreshToken: String): Observable<string>{
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    return this.http.post(`${this.apiUrl}/logout`,{refreshToken}, {responseType: 'text'});
+    
+    return this.http.post(`${this.apiUrl}/logout`,{refreshToken}, {responseType: 'text'})
+    .pipe(
+      finalize(()=>{
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      })
+    );
   }
 }

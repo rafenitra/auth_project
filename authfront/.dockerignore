@@ -1,0 +1,32 @@
+# Dépendances
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist
+coverage
+
+# Angular cache
+.angular
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE / Editor
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files (si sensibles)
+.env
+.env.*

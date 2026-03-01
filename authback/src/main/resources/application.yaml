@@ -11,7 +11,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -23,3 +23,7 @@ app:
 server: 
     port : ${SERVER_PORT}
 
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG    # Détails sur les requêtes HTTP
