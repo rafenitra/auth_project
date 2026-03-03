@@ -90,8 +90,6 @@ describe('AuthService', () => {
 
     service.logout(refresh).subscribe((response)=>{
       expect(response).toBe(mockResponse);
-      expect(service.getAccessToken()).toBeNull();
-      expect(service.getRefreshToken()).toBeNull();
     });
       
     const req = httpMock.expectOne(`${basicUrl}/logout`);

@@ -20,6 +20,10 @@ public class JwtService {
     @Value("${app.security.jwt-secret}")
     private String secret_key;
 
+    public void setSecret_key(String secret_key) {
+        this.secret_key = secret_key;
+    }
+
     //générer la clé de signature utilisable par JJWT
     private Key getSigninKey(){
         return Keys.hmacShaKeyFor(secret_key.getBytes());

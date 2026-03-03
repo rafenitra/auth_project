@@ -3,6 +3,7 @@ package com.authbackend.authback.unit;
 import com.authbackend.authback.entity.User;
 import com.authbackend.authback.service.JwtService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +22,11 @@ public class JwtServiceTest {
 
     @InjectMocks
     private JwtService jwtService;
+
+    @BeforeEach
+    void setUp(){
+        jwtService.setSecret_key("test-secret-key-123456789012345678901234567890");
+    }
 
     @Test
     void generateToken_returnNotNullToken(){

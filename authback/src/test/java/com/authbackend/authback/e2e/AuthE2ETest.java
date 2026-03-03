@@ -3,7 +3,10 @@ package com.authbackend.authback.e2e;
 import com.authbackend.authback.dto.AuthResponse;
 import com.authbackend.authback.repository.RefreshTokenRepository;
 import com.authbackend.authback.repository.UserRepository;
+import com.authbackend.authback.service.JwtService;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,9 @@ public class AuthE2ETest {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private JwtService jwtService;
 
     private String accessToken;
     private String refreshToken;
@@ -127,13 +133,12 @@ public class AuthE2ETest {
                             "refreshToken" : "%s"
                         }
                         """.formatted(refreshResponse.refreshToken()))
+                .header("Authorization", "Bearer "+ refreshResponse.accessToken())
                 .when()
                 .post("/auth/logout")
                 .then()
                 .statusCode(200)
                 .body(equalTo("Vous êtes déconnecté"));
     }
-
-
 
 }
