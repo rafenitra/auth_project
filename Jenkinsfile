@@ -6,6 +6,7 @@ pipeline {
         nodejs 'NODE_JS'
     }
 
+    //Commentaire pour savoir si ça marche avec l'automatisation du pipeline ou pas
     environment {
         SONAR_TOKEN = credentials('sonarcloud_token')
         // On utilise des chemins relatifs au workspace de Jenkins
