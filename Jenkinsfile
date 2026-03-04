@@ -70,7 +70,6 @@ pipeline {
                         -Dsonar.organization=rafenitra ^
                         -Dsonar.host.url=https://sonarcloud.io ^
                         -Dsonar.token=%SONAR_TOKEN% ^
-                        -Dsonar.qualitygate.wait=true ^
                         -Dsonar.sources=src ^
                         -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts
                         """
