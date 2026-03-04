@@ -7,6 +7,7 @@ pipeline {
     }
 
     //Commentaire pour savoir si ça marche avec l'automatisation du pipeline ou pas
+    //rajout commentaire
     environment {
         SONAR_TOKEN = credentials('sonarcloud_token')
         // On utilise des chemins relatifs au workspace de Jenkins
