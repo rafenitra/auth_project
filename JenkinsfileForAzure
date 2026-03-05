@@ -31,7 +31,7 @@ pipeline {
                     sh 'npm install'
                     echo "Exécution des tests Angular..."
                     // Ajout du flag --watch=false pour que Jenkins ne bloque pas
-                    bat 'npx ng test --watch=false --browsers=ChromeHeadless'
+                    sh 'npx ng test --watch=false --browsers=ChromeHeadless'
                 }
             }
         }
