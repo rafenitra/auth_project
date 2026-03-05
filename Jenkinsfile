@@ -81,13 +81,22 @@ pipeline {
             }
         }
 
-        stage('6. Docker Build') {
-            steps {
-                // Docker-compose à la racine du projet
-                echo "Construction des images Docker..."
-                bat 'docker-compose build'
-            }
-        }
+        stage('6. Déploiement Local (Docker Compose)') {
+                    steps {
+                        // On se place à la racine où se trouve ton docker-compose.yml
+                        echo "Arrêt des anciens containers et lancement des nouveaux..."
+
+                        // --build force la reconstruction si les fichiers ont changé
+                        // -d lance les containers en arrière-plan (détaché)
+                        // --remove-orphans nettoie les vieux services supprimés du fichier
+                        bat 'docker-compose up -d --build --remove-orphans'
+
+                        echo "🚀 Application déployée avec succès !"
+                        echo "Frontend : http://localhost:4200"
+                        echo "Backend  : http://localhost:8080"
+                    }
+                }
+
     }
 
     post {
