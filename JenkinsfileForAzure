@@ -90,7 +90,7 @@ pipeline {
         stage('7. Push vers le docker registry'){
             agent {label 'PC_LOCAL'}
             steps {
-                bat 'docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}'
+                bat 'docker login -u %DOCKER_CREDS_USR% -p %DOCKER_CREDS_PSW%'
                 bat 'docker-compose push'
                 echo "Application publié dans Docker Hub"
             }
