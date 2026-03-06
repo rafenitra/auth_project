@@ -1,4 +1,8 @@
 spring:
+
+  profiles:
+    active: dev
+
   application:
     name: authback
 
@@ -21,9 +25,10 @@ app:
     jwt-secret: ${JWT_SECRET:default-insecure-test-key-32-chars-min}
 
 server: 
-    port : ${SERVER_PORT}
+    port : ${SERVER_PORT:8080}
 
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG    # Détails sur les requêtes HTTP
+

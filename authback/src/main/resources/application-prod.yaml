@@ -1,0 +1,7 @@
+websocket:
+  allowed-origins: http://4.233.149.142:80
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO

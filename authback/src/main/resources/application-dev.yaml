@@ -1,0 +1,7 @@
+websocket:
+  allowed-origins: http://localhost:4200
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework.web: DEBUG

@@ -6,7 +6,6 @@ pipeline {
         DOCKER_CREDS = credentials('dockerhub_creds')
         BACK_DIR = "authback"
         FRONT_DIR = "authfront"
-	    IP_ADDRESS = "http://4.233.149.142"
     }
 
     stages {
@@ -36,7 +35,7 @@ pipeline {
             steps {
                 dir("${env.BACK_DIR}") {
                     echo "Tests JUnit..."
-                    bat 'mvn clean test'
+                    bat 'mvn test "-Dspring.profiles.active=test" '
                 }
             }
         }
