@@ -6,7 +6,7 @@ import { finalize, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/auth';
+  private apiUrl = 'http://${environment.apiUrl}:8080/auth';
 
   constructor(private http: HttpClient){
   }
@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   logout(refreshToken: String): Observable<string>{
-    
+
     return this.http.post(`${this.apiUrl}/logout`,{refreshToken}, {responseType: 'text'})
     .pipe(
       finalize(()=>{

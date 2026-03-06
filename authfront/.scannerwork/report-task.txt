@@ -1,0 +1,7 @@
+organization=rafenitra
+projectKey=rafenitra_auth_project_frontend
+serverUrl=https://sonarcloud.io
+serverVersion=8.0.0.82369
+dashboardUrl=https://sonarcloud.io/dashboard?id=rafenitra_auth_project_frontend
+ceTaskId=AZy46WIh2KcLQCd64il3
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZy46WIh2KcLQCd64il3

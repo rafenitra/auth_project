@@ -84,7 +84,7 @@ pipeline {
         stage('6. Déploiement Local (Docker Compose)') {
                     steps {
                         // On se place à la racine où se trouve ton docker-compose.yml
-                        echo "Arrêt des anciens containers et lancement des nouveaux..."
+                        //echo "Arrêt des anciens containers et lancement des nouveaux..."
 
                         // --build force la reconstruction si les fichiers ont changé
                         // -d lance les containers en arrière-plan (détaché)
@@ -95,7 +95,7 @@ pipeline {
                         echo "Frontend : http://localhost:4200"
                         echo "Backend  : http://localhost:8080"
                     }
-                }
+        }
 
     }
 

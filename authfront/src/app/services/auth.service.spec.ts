@@ -7,7 +7,7 @@ import { provideHttpClient } from '@angular/common/http';
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
-  const basicUrl = 'http://localhost:8080/auth';
+  const basicUrl = 'http://${environment.apiUrl}:8080/auth';
 
 
   beforeEach(() => {
@@ -61,12 +61,12 @@ describe('AuthService', () => {
     const req = httpMock.expectOne(`${basicUrl}/login`);
     expect(req.request.body).toEqual(crededntials);
     expect(req.request.method).toBe('POST');
-    
+
     req.flush(mockResponse);
   });
 
   it('doit sauvegarder les tokens dans le localStorage récupère ce qui a été sauvegardé', () =>{
-    
+
     const accessToken = 'fakeAccessToken';
     const refresh = 'fakeRefreshToken';
 
@@ -78,7 +78,7 @@ describe('AuthService', () => {
   });
 
   it('doit effectuer le logout et supprimer les tokens du localStorage', () =>{
-    
+
     const accessToken = 'fakeAccessToken';
     const refresh = 'fakeRefreshToken';
     const mockResponse = 'Logout successful';
@@ -91,7 +91,7 @@ describe('AuthService', () => {
     service.logout(refresh).subscribe((response)=>{
       expect(response).toBe(mockResponse);
     });
-      
+
     const req = httpMock.expectOne(`${basicUrl}/logout`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({refreshToken: refresh});
@@ -107,7 +107,7 @@ describe('AuthService', () => {
 
     const req = httpMock.expectOne(`${basicUrl}/me`);
     expect(req.request.method).toBe('GET');
-   
+
     req.flush(mockUser);
   });
 
