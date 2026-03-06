@@ -97,7 +97,7 @@ pipeline {
         }
 
         stage('8. CD & Deploy (SUR AZURE)') {
-            agent any // Le Maître (Azure) reprend la main
+            agent {label 'contrôleur'} // Le Maître (Azure) reprend la main
             steps {
                 // On récupère les nouvelles images depuis Docker Hub
                 sh 'docker-compose pull'
