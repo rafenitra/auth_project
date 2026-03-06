@@ -1,54 +1,50 @@
 pipeline {
-    agent any
+    agent none
 
-    tools {
-        maven 'MAVEN_3'
-        nodejs 'NODE_JS'
-    }
-
-    //Commentaire pour savoir si ça marche avec l'automatisation du pipeline ou pas
-    //rajout commentaire
-    //un autre commentaire
     environment {
         SONAR_TOKEN = credentials('sonarcloud_token')
-        // On utilise des chemins relatifs au workspace de Jenkins
+        DOCKER_CREDS = credentials('dockerhub_creds')
         BACK_DIR = "authback"
         FRONT_DIR = "authfront"
     }
 
     stages {
         stage('1. Checkout & Init') {
+            agent any
             steps {
-                // Jenkins récupère automatiquement le code ici si configuré en "Pipeline from SCM"
-                echo "Code récupéré depuis GitHub dans : ${WORKSPACE}"
+                // Jenkins récupère automatiquement le code ici (configuré "Pipeline from SCM")
+                echo "Code récupéré depuis GitHub"
             }
         }
 
         stage('2. Frontend (Installation & Tests)') {
+            agent {label 'PC_LOCAL'}
             steps {
                 dir("${env.FRONT_DIR}") {
                     echo "Installation des modules..."
-                    sh 'npm install'
+                    bat 'npm install'
                     echo "Exécution des tests Angular..."
                     // Ajout du flag --watch=false pour que Jenkins ne bloque pas
-                    sh 'npx ng test --watch=false --browsers=ChromeHeadless'
+                    bat 'npx ng test --watch=false --browsers=ChromeHeadless'
                 }
             }
         }
 
         stage('3. Backend (Compilation & Tests)') {
+            agent {label 'PC_LOCAL'}
             steps {
                 dir("${env.BACK_DIR}") {
                     echo "Tests JUnit..."
-                    sh 'mvn clean test'
+                    bat 'mvn clean test'
                 }
             }
         }
 
         stage('4. Analyse Sonar - Backend') {
+            agent {label 'PC_LOCAL'}
             steps {
                 dir("${env.BACK_DIR}") {
-                    sh """
+                    bat """
                     mvn sonar:sonar ^
                     -Dsonar.projectKey=rafenitra_auth_project ^
                     -Dsonar.organization=rafenitra ^
@@ -63,11 +59,12 @@ pipeline {
         }
 
         stage('5. Analyse Sonar - Frontend') {
+            agent {label 'PC_LOCAL'}
             steps {
                 script {
                     def scannerHome = tool name: 'SONAR_SCANNER_CLI', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     dir("${env.FRONT_DIR}") {
-                        sh """
+                        bat """
                         "${scannerHome}/bin/sonar-scanner" ^
                         -Dsonar.projectKey=rafenitra_auth_project_frontend ^
                         -Dsonar.organization=rafenitra ^
@@ -81,20 +78,33 @@ pipeline {
             }
         }
 
-        stage('6. Déploiement Local (Docker Compose)') {
-                    steps {
-                        // On se place à la racine où se trouve ton docker-compose.yml
-                        //echo "Arrêt des anciens containers et lancement des nouveaux..."
+        stage('6. Build (Docker Compose)') {
+            agent {label 'PC_LOCAL'}
+            steps {
+                echo "Debut du docker compose build"
+                bat 'docker-compose build'
+                echo "Application buildé avec succès !"
+            }
+        }
 
-                        // --build force la reconstruction si les fichiers ont changé
-                        // -d lance les containers en arrière-plan (détaché)
-                        // --remove-orphans nettoie les vieux services supprimés du fichier
-                        sh 'docker-compose up -d --build --remove-orphans'
+        stage('7. Push vers le docker registry'){
+            agent {label 'PC_LOCAL'}
+            steps {
+                bat 'docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}'
+                bat 'docker-compose push'
+                echo "Application publié dans Docker Hub"
+            }
+        }
 
-                        echo "🚀 Application déployée avec succès !"
-                        echo "Frontend : http://localhost:4200"
-                        echo "Backend  : http://localhost:8080"
-                    }
+        stage('8. CD & Deploy (SUR AZURE)') {
+            agent any // Le Maître (Azure) reprend la main
+            steps {
+                // On récupère les nouvelles images depuis Docker Hub
+                sh 'docker-compose pull'
+                // On relance l'app avec les nouvelles images
+                sh 'docker-compose up -d --remove-orphans'
+                echo "Déploiement terminé sur http://IP_AZURE:4200"
+            }
         }
 
     }
