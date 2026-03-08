@@ -103,11 +103,10 @@ pipeline {
                 // On récupère les nouvelles images depuis Docker Hub
                 sh 'docker compose pull'
                 // On relance l'app avec les nouvelles images
-                sh 'docker-compose up -d --remove-orphans'
+                sh 'docker compose up -d --remove-orphans'
                 echo "Déploiement terminé sur http://IP_AZURE:4200"
             }
         }
-
     }
 
     post {
