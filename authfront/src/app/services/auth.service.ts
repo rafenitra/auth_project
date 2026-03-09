@@ -6,7 +6,7 @@ import { finalize, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://${environment.apiUrl}:8080/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient){
   }
