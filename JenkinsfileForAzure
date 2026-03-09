@@ -96,7 +96,14 @@ pipeline {
             }
         }
 
-        stage('8. CD & Deploy (SUR AZURE)') {
+        stage('8. Clean les containeurs avant') {
+                agent { label 'built-in' }
+                steps {
+                sh 'docker compose down --remove-orphans || true'
+            }
+        }
+
+        stage('9. CD & Deploy (SUR AZURE)') {
             agent { label 'built-in' } // Le Maître (Azure) reprend la main
             steps {
                 sh 'ls -a'
