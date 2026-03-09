@@ -3,11 +3,12 @@ import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
-  const basicUrl = 'http://${environment.apiUrl}:8080/auth';
+  const basicUrl = `${environment.apiUrl}/auth`;
 
 
   beforeEach(() => {
