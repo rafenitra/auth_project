@@ -30,5 +30,5 @@ server:
 logging:
   level:
     root: INFO
-    org.springframework.web: DEBUG    # Détails sur les requêtes HTTP
+    org.springframework.web: INFO   # Détails sur les requêtes HTTP
 
