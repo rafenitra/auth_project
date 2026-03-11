@@ -1,5 +1,5 @@
 websocket:
-  allowed-origins: http://4.233.149.142:80
+  allowed-origins: http://4.233.149.142
 
 logging:
   level:

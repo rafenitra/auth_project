@@ -1,5 +1,5 @@
 websocket:
-  allowed-origins: http://localhost:4200
+  allowed-origins: http://localhost
 
 logging:
   level:
