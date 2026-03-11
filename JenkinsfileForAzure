@@ -99,8 +99,8 @@ pipeline {
         stage('8. Clean les containeurs avant') {
                 agent { label 'built-in' }
                 steps {
-                //sh 'docker compose down --remove-orphans || true'
-		sh 'docker-compose down'
+                sh 'docker-compose down --remove-orphans || true'
+		//sh 'docker-compose down'
             }
         }
 
