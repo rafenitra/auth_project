@@ -100,7 +100,7 @@ pipeline {
                 agent { label 'built-in' }
                 steps {
                 //sh 'docker compose down --remove-orphans || true'
-		sh 'docker compose down'
+		sh 'docker-compose down'
             }
         }
 
@@ -109,10 +109,10 @@ pipeline {
             steps {
                 sh 'ls -a'
                 // On récupère les nouvelles images depuis Docker Hub
-                sh 'docker compose pull'
+                sh 'docker-compose pull'
                 // On relance l'app avec les nouvelles images
                 //sh 'docker compose up -d --remove-orphans'
-		sh 'docker compose up -d'
+		sh 'docker-compose up -d'
                 echo "Déploiement terminé sur http://IP_AZURE:4200"
             }
         }
