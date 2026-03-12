@@ -12,5 +12,5 @@ FROM alpine/java:22.0.2-jre
 WORKDIR /app
 COPY --from=build /build/target/*-SNAPSHOT.jar app.jar
 EXPOSE 8080
-#faut toujours préciser production
+#faut toujours préciser production ici
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod","-jar", "app.jar"]
