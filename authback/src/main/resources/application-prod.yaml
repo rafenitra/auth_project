@@ -1,5 +1,5 @@
 websocket:
-  allowed-origins: http://4.233.149.142
+  allowed-origins: ${CORS_ORIGIN}
 
 logging:
   level:
