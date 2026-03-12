@@ -1,30 +1,30 @@
 pipeline {
-    agent any
+    agent none
 
-    tools {
-        maven 'MAVEN_3'
-        nodejs 'NODE_JS'
-    }
-
-    //Commentaire pour savoir si ça marche avec l'automatisation du pipeline ou pas
-    //rajout commentaire
-    //un autre commentaire
     environment {
         SONAR_TOKEN = credentials('sonarcloud_token')
-        // On utilise des chemins relatifs au workspace de Jenkins
+        DOCKER_CREDS = credentials('dockerhub_creds')
         BACK_DIR = "authback"
         FRONT_DIR = "authfront"
     }
 
     stages {
         stage('1. Checkout & Init') {
+            agent {label 'PC_LOCAL'}
             steps {
-                // Jenkins récupère automatiquement le code ici si configuré en "Pipeline from SCM"
-                echo "Code récupéré depuis GitHub dans : ${WORKSPACE}"
+                script {
+                    if (!fileExists(".git")) {
+                        bat "git clone -b develop https://github.com/rafenitra/auth_project.git ."
+                    } else {
+                        bat "git fetch origin develop"
+                        bat "git reset --hard origin/develop"
+                    }
+                }
             }
         }
 
         stage('2. Frontend (Installation & Tests)') {
+            agent {label 'PC_LOCAL'}
             steps {
                 dir("${env.FRONT_DIR}") {
                     echo "Installation des modules..."
@@ -37,15 +37,17 @@ pipeline {
         }
 
         stage('3. Backend (Compilation & Tests)') {
+            agent {label 'PC_LOCAL'}
             steps {
                 dir("${env.BACK_DIR}") {
                     echo "Tests JUnit..."
-                    bat 'mvn clean test'
+                    bat 'mvn test "-Dspring.profiles.active=test" '
                 }
             }
         }
 
         stage('4. Analyse Sonar - Backend') {
+            agent {label 'PC_LOCAL'}
             steps {
                 dir("${env.BACK_DIR}") {
                     bat """
@@ -63,6 +65,7 @@ pipeline {
         }
 
         stage('5. Analyse Sonar - Frontend') {
+            agent {label 'PC_LOCAL'}
             steps {
                 script {
                     def scannerHome = tool name: 'SONAR_SCANNER_CLI', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
@@ -81,22 +84,61 @@ pipeline {
             }
         }
 
-        stage('6. Déploiement Local (Docker Compose)') {
-                    steps {
-                        // On se place à la racine où se trouve ton docker-compose.yml
-                        //echo "Arrêt des anciens containers et lancement des nouveaux..."
-
-                        // --build force la reconstruction si les fichiers ont changé
-                        // -d lance les containers en arrière-plan (détaché)
-                        // --remove-orphans nettoie les vieux services supprimés du fichier
-                        bat 'docker-compose up -d --build --remove-orphans'
-
-                        echo "🚀 Application déployée avec succès !"
-                        echo "Frontend : http://localhost:4200"
-                        echo "Backend  : http://localhost:8080"
-                    }
+        stage('6. Build (Docker Compose)') {
+            agent {label 'PC_LOCAL'}
+            steps {
+                echo "Debut du docker compose build"
+                bat 'docker-compose build'
+                echo "Application buildé avec succès !"
+            }
         }
 
+        stage('7. Push vers le docker registry'){
+            agent {label 'PC_LOCAL'}
+            steps {
+                bat 'docker login -u %DOCKER_CREDS_USR% -p %DOCKER_CREDS_PSW%'
+                bat 'docker-compose push'
+                echo "Application publié dans Docker Hub"
+            }
+        }
+
+        stage('8. Clean les containeurs avant') {
+                agent { label 'built-in' }
+                steps {
+                    sh 'docker-compose down --remove-orphans || true'
+            
+                    // 2. Suppression forcée des conteneurs par leur nom exact 
+                    // (Cela règle le conflit même si le conteneur vient d'un autre projet)
+                    sh 'docker rm -f auth-db authapp-back authapp-front || true'
+                //sh 'docker-compose down --remove-orphans || true'
+		        //sh 'docker-compose down'
+            }
+        }
+
+        stage('9. CD & Deploy (SUR AZURE)') {
+            agent { label 'built-in' } // Le Maître (Azure) reprend la main
+            steps {
+                withCredentials([
+                    string(credentialsId: 'db_password_prod', variable: 'DB_PASSWORD'),
+                    string(credentialsId: 'jwt_secret_prod', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'cors_url_prod', variable: 'CORS_URL')
+                ]){
+                    script {
+                        env.DB_USER = "postgres"
+                        env.DB_NAME = "authdb"
+                        
+                        if (!fileExists(".git")) {
+                            sh "git clone -b develop https://github.com/rafenitra/auth_project.git ."
+                        } else {
+                            sh "git fetch origin develop && git reset --hard origin/develop"
+                        }
+                        sh 'docker-compose pull'
+		                sh 'docker-compose up -d'
+                    }
+                }
+                echo "Déploiement terminé"
+            }
+        }
     }
 
     post {
